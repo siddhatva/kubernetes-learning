@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kublearn
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: firstapp
+  template:
+    metadata:
+      labels:
+        app: firstapp
+    spec:
+      containers:
+        - name: mykube
+          image: diliplakshya/mykube
+          ports:
+            - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            periodSeconds: 10
+            initialDelaySeconds: 5
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /app/data
+              name: app-volume
+        - name: mykubetest
+          image: diliplakshya/mykubetest
+          ports:
+            - containerPort: 8089
+          imagePullPolicy: Always
+      volumes:
+        - name: app-volume
+          hostPath:
+            path: /data
+            type: DirectoryOrCreate
